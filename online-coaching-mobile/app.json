@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Online Coaching Mobile",
+    "slug": "online-coaching-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.onlinecoaching.mobile"
+    },
+    "android": {
+      "package": "com.onlinecoaching.mobile",
+      "permissions": [
+        "INTERNET"
+      ]
+    }
+  }
+}

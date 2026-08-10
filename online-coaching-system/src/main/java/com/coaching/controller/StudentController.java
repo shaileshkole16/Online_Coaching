@@ -1,5 +1,6 @@
 package com.coaching.controller;
 
+import com.coaching.dto.StudentResponse;
 import com.coaching.entities.Student;
 import com.coaching.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,8 @@ public class StudentController {
     @Autowired private StudentService studentService;
 
     @GetMapping
-    public ResponseEntity<List<Student>> getAllStudents() {
-        return ResponseEntity.ok(studentService.getAllStudents());
+    public ResponseEntity<List<StudentResponse>> getAllStudents() {
+        return ResponseEntity.ok(studentService.getAllStudentsResponse());
     }
 
     @GetMapping("/{studentId}")

@@ -116,7 +116,7 @@ const StudentDashboard = () => {
     },
     {
       label: 'Completed Lectures',
-      value: dashboard?.completedLectures || 0,
+      value: `${dashboard?.completedLectures || 0}/${dashboard?.totalLectures || 0}`,
       icon: CheckCircle,
       color: 'bg-green-500',
       bgColor: 'bg-green-50',
@@ -131,8 +131,8 @@ const StudentDashboard = () => {
       textColor: 'text-orange-600',
     },
     {
-      label: 'Quiz Scores',
-      value: `${dashboard?.averageQuizScore || 0}%`,
+      label: 'Overall Progress',
+      value: `${Math.round(dashboard?.overallProgress || 0)}%`,
       icon: TrendingUp,
       color: 'bg-purple-500',
       bgColor: 'bg-purple-50',
@@ -197,12 +197,12 @@ const StudentDashboard = () => {
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">{enrollment.course?.title}</h3>
                 <p className="text-sm text-gray-600 mb-4">
-                  Progress: {enrollment.progress || 0}%
+                  Progress: {Math.round(dashboard?.overallProgress || 0)}%
                 </p>
                 <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
                   <div 
                     className="bg-primary-600 h-2 rounded-full transition-all"
-                    style={{ width: `${enrollment.progress || 0}%` }}
+                    style={{ width: `${Math.round(dashboard?.overallProgress || 0)}%` }}
                   ></div>
                 </div>
                 <Link 

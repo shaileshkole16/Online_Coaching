@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/audit-logs")
+@RequestMapping("/api/audit-logs")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class AuditLogController {
@@ -21,6 +21,29 @@ public class AuditLogController {
     @PostMapping("/create")
     public ResponseEntity<AuditLogResponse> createLog(@RequestBody AuditLogRequest request) {
         return ResponseEntity.ok(auditLogService.createLog(request));
+    }
+    
+    @PostMapping("/sample")
+    public ResponseEntity<String> createSampleLogs() {
+        // Create some sample audit logs for demonstration
+        auditLogService.createLog(createSampleRequest(1, "LOGIN", "USER", null, null, "127.0.0.1", "Mozilla/5.0"));
+        auditLogService.createLog(createSampleRequest(1, "CREATE", "COURSE", 1, null, "127.0.0.1", "Mozilla/5.0"));
+        auditLogService.createLog(createSampleRequest(1, "UPDATE", "USER", 1, "Active -> Inactive", "127.0.0.1", "Mozilla/5.0"));
+        auditLogService.createLog(createSampleRequest(2, "LOGIN", "USER", null, null, "192.168.1.1", "Mozilla/5.0"));
+        auditLogService.createLog(createSampleRequest(1, "APPROVE", "COURSE", 1, "Pending -> Approved", "127.0.0.1", "Mozilla/5.0"));
+        return ResponseEntity.ok("Sample audit logs created successfully");
+    }
+    
+    private AuditLogRequest createSampleRequest(Integer userId, String action, String entityType, Integer entityId, String newValue, String ipAddress, String userAgent) {
+        AuditLogRequest request = new AuditLogRequest();
+        request.setUserId(userId);
+        request.setAction(action);
+        request.setEntityType(entityType);
+        request.setEntityId(entityId);
+        request.setNewValue(newValue);
+        request.setIpAddress(ipAddress);
+        request.setUserAgent(userAgent);
+        return request;
     }
     
     @GetMapping("/user/{userId}")

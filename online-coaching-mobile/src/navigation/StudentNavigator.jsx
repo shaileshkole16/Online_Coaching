@@ -6,9 +6,8 @@ import { useTheme } from '../contexts/ThemeContext';
 import StudentDashboardScreen from '../screens/student/StudentDashboardScreen';
 import StudentProfileScreen from '../screens/student/StudentProfileScreen';
 import CourseListScreen from '../screens/student/CourseListScreen';
-import MessagesScreen from '../screens/student/MessagesScreen';
+import DiscussionForumScreen from '../screens/student/DiscussionForumScreen';
 import ResultsScreen from '../screens/student/ResultsScreen';
-import SettingsScreen from '../screens/shared/SettingsScreen';
 import CourseDetailScreen from '../screens/shared/CourseDetailScreen';
 import LectureListScreen from '../screens/shared/LectureListScreen';
 import AssignmentListScreen from '../screens/shared/AssignmentListScreen';
@@ -44,9 +43,8 @@ const StudentNavigator = () => {
           let iconName;
           if (route.name === 'Home') iconName = 'home';
           else if (route.name === 'Courses') iconName = 'book';
-          else if (route.name === 'Messages') iconName = 'message';
+          else if (route.name === 'Forum') iconName = 'forum';
           else if (route.name === 'Results') iconName = 'assessment';
-          else if (route.name === 'Settings') iconName = 'settings';
           
           return <MaterialIcons name={iconName} size={size} color={color} />;
         },
@@ -60,9 +58,8 @@ const StudentNavigator = () => {
     >
       <Tab.Screen name="Home" component={StudentStack} options={{ title: 'Home' }} />
       <Tab.Screen name="Courses" component={CourseListScreen} options={{ title: 'Courses' }} />
-      <Tab.Screen name="Messages" component={MessagesScreen} options={{ title: 'Messages' }} />
+      <Tab.Screen name="Forum" component={DiscussionForumScreen} options={{ title: 'Forum' }} />
       <Tab.Screen name="Results" component={ResultsScreen} options={{ title: 'Results' }} />
-      <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
     </Tab.Navigator>
   );
 };

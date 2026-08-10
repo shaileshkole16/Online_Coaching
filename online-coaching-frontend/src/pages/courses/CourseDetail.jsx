@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { courseAPI, lectureAPI, enrollmentAPI, studentAPI, assignmentAPI, quizAPI, courseRatingAPI } from '../../services/api';
+import { courseAPI, lectureAPI, studentAPI, assignmentAPI, quizAPI, courseRatingAPI } from '../../services/api';
 import { 
   BookOpen, 
   Clock, 
@@ -28,7 +28,7 @@ const CourseDetail = () => {
   const [lectures, setLectures] = useState([]);
   const [assignments, setAssignments] = useState([]);
   const [quizzes, setQuizzes] = useState([]);
-  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [quizAttempts, setQuizAttempts] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -74,8 +74,8 @@ const CourseDetail = () => {
       }));
       setQuizzes(normalizedQuizzes);
 
+      // Check quiz attempts for students
       if (user?.role === 'STUDENT') {
-        // Get studentId first using userId
         let studentId = user.id;
         try {
           const studentRes = await studentAPI.getStudentByUserId(user.id);
@@ -83,37 +83,23 @@ const CourseDetail = () => {
         } catch (err) {
           console.log('Student record not found, using userId');
         }
-        
-        const enrollmentsRes = await enrollmentAPI.getStudentEnrollments(studentId);
-        console.log('Checking enrollment for course ID:', id);
-        console.log('Enrollments:', enrollmentsRes.data);
-        const enrolled = enrollmentsRes.data.some(e => e.course?.courseId === parseInt(id) || e.course?.id === parseInt(id));
-        console.log('Is enrolled:', enrolled);
-        setIsEnrolled(enrolled);
+
+        const attempts = {};
+        for (const quiz of normalizedQuizzes) {
+          try {
+            const attemptRes = await quizAPI.checkQuizAttempt(quiz.quizId, studentId);
+            attempts[quiz.quizId] = attemptRes.data;
+          } catch (err) {
+            attempts[quiz.quizId] = false;
+          }
+        }
+        setQuizAttempts(attempts);
       }
     } catch (err) {
       setError('Failed to load course details');
       console.error(err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleEnroll = async () => {
-    try {
-      // Get studentId first using userId
-      let studentId = user.id;
-      try {
-        const studentRes = await studentAPI.getStudentByUserId(user.id);
-        studentId = studentRes.data.studentId;
-      } catch (err) {
-        console.log('Student record not found, using userId');
-      }
-      
-      await enrollmentAPI.enrollStudent(studentId, id);
-      setIsEnrolled(true);
-    } catch (err) {
-      console.error('Failed to enroll:', err);
     }
   };
 
@@ -190,234 +176,193 @@ const CourseDetail = () => {
           <div className="flex-1">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">{course.title}</h2>
             <p className="text-gray-600 mb-4">{course.description}</p>
-            <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+            <div className="flex flex-wrap gap-6 text-sm">
               <div className="flex items-center gap-2">
-                <Clock size={18} />
-                <span>{course.duration || 'N/A'}</span>
+                <Clock className="text-gray-500" size={18} />
+                <span className="font-semibold text-gray-700">Duration:</span>
+                <span className="text-gray-600">{course.duration || 'N/A'}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Users size={18} />
-                <span>{course.enrolledCount || 0} students enrolled</span>
+                <Users className="text-gray-500" size={18} />
+                <span className="font-semibold text-gray-700">Students:</span>
+                <span className="text-gray-600">{course.enrolledCount || 0}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-semibold text-primary-600">
-                  {course.price ? `₹${course.price}` : 'Free'}
-                </span>
-              </div>
-              {course.teacherName && (
-                <div className="flex items-center gap-2">
-                  <Award size={18} />
-                  <span>Instructor: {course.teacherName}</span>
-                </div>
-              )}
             </div>
           </div>
         </div>
+      </div>
 
-        {!isEnrolled && user?.role === 'STUDENT' && (
-          <div className="mt-6 pt-6 border-t border-gray-100">
-            <button onClick={handleEnroll} className="btn-primary w-full">
-              Enroll in this Course
-            </button>
+      {/* Course Lectures */}
+      <div className="card">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-semibold text-gray-900">Course Lectures</h3>
+          <Link
+            to={`/${isTeacher ? 'teacher' : 'student'}/courses/${id}/lectures`}
+            className="btn-secondary flex items-center gap-2"
+          >
+            <Play size={16} />
+            View All Lectures
+          </Link>
+        </div>
+        
+        {lectures.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <FileText size={48} className="mx-auto mb-4 text-gray-300" />
+            <p>No lectures added yet</p>
+            {isTeacher && (
+              <Link
+                to={`/teacher/courses/${id}/lectures`}
+                className="btn-primary inline-flex items-center gap-2 mt-4"
+              >
+                <Play size={16} />
+                Add Lecture
+              </Link>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {lectures.slice(0, 3).map((lecture, index) => (
+              <div key={lecture.lectureId || lecture.id || index} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-primary-600 font-semibold">{index + 1}</span>
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-medium text-gray-900">{lecture.title}</h4>
+                  <p className="text-sm text-gray-500">{lecture.duration || 'N/A'}</p>
+                </div>
+                <Play className="text-primary-600" size={20} />
+              </div>
+            ))}
+            {lectures.length > 3 && (
+              <Link
+                to={`/${isTeacher ? 'teacher' : 'student'}/courses/${id}/lectures`}
+                className="text-center block text-sm text-primary-600 hover:text-primary-700 mt-2"
+              >
+                View all {lectures.length} lectures
+              </Link>
+            )}
           </div>
         )}
       </div>
 
-      {/* Lectures */}
-      {isEnrolled || isTeacher ? (
-        <div className="card">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-gray-900">Course Lectures</h3>
+      {/* Assignments */}
+      <div className="card">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-semibold text-gray-900">Assignments</h3>
+          {isTeacher && (
             <Link
-              to={`/${isTeacher ? 'teacher' : 'student'}/courses/${id}/lectures`}
+              to={`/teacher/courses/${id}/assignments`}
               className="btn-secondary flex items-center gap-2"
             >
-              <Play size={16} />
-              View All Lectures
+              <FileText size={16} />
+              Manage Assignments
             </Link>
-          </div>
-          
-          {lectures.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <FileText size={48} className="mx-auto mb-4 text-gray-300" />
-              <p>No lectures added yet</p>
-              {isTeacher && (
-                <Link
-                  to={`/teacher/courses/${id}/lectures`}
-                  className="btn-primary inline-flex items-center gap-2 mt-4"
-                >
-                  <Play size={16} />
-                  Add Lecture
-                </Link>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {lectures.slice(0, 3).map((lecture, index) => (
-                <div key={lecture.lectureId || lecture.id || index} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
-                  <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-primary-600 font-semibold">{index + 1}</span>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900">{lecture.title}</h4>
-                    <p className="text-sm text-gray-500">{lecture.duration || 'N/A'}</p>
-                  </div>
-                  <Play className="text-primary-600" size={20} />
-                </div>
-              ))}
-              {lectures.length > 3 && (
-                <Link
-                  to={`/${isTeacher ? 'teacher' : 'student'}/courses/${id}/lectures`}
-                  className="text-center block text-sm text-primary-600 hover:text-primary-700 mt-2"
-                >
-                  View all {lectures.length} lectures
-                </Link>
-              )}
-            </div>
           )}
         </div>
-      ) : (
-        <div className="card text-center py-8 text-gray-500">
-          <Lock className="mx-auto mb-4 text-gray-300" size={48} />
-          <p>Enroll in this course to view the content</p>
-        </div>
-      )}
-
-      {/* Assignments */}
-      {isEnrolled || isTeacher ? (
-        <div className="card">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-gray-900">Assignments</h3>
+        
+        {assignments.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <FileText size={48} className="mx-auto mb-4 text-gray-300" />
+            <p>No assignments created yet</p>
             {isTeacher && (
               <Link
                 to={`/teacher/courses/${id}/assignments`}
-                className="btn-secondary flex items-center gap-2"
+                className="btn-primary inline-flex items-center gap-2 mt-4"
               >
                 <FileText size={16} />
-                Manage Assignments
+                Create Assignment
               </Link>
             )}
           </div>
-          
-          {assignments.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <FileText size={48} className="mx-auto mb-4 text-gray-300" />
-              <p>No assignments created yet</p>
-              {isTeacher && (
-                <Link
-                  to={`/teacher/courses/${id}/assignments`}
-                  className="btn-primary inline-flex items-center gap-2 mt-4"
-                >
-                  <FileText size={16} />
-                  Create Assignment
-                </Link>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {assignments.map((assignment) => (
-                <div key={assignment.assignmentId} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <FileText className="text-purple-600" size={20} />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900">{assignment.title}</h4>
-                    <p className="text-sm text-gray-500">Due: {assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : 'No due date'}</p>
-                  </div>
-                  {isStudent && (
-                    <Link
-                      to={`/student/courses/${id}/assignments`}
-                      className="btn-secondary px-3 py-1 text-sm"
-                    >
-                      View Assignments
-                    </Link>
-                  )}
+        ) : (
+          <div className="space-y-3">
+            {assignments.map((assignment) => (
+              <div key={assignment.assignmentId} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <FileText className="text-purple-600" size={20} />
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="card text-center py-8 text-gray-500">
-          <Lock className="mx-auto mb-4 text-gray-300" size={48} />
-          <p>Enroll in this course to view assignments</p>
-        </div>
-      )}
+                <div className="flex-1">
+                  <h4 className="font-medium text-gray-900">{assignment.title}</h4>
+                  <p className="text-sm text-gray-500">Due: {assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : 'No due date'}</p>
+                </div>
+                {isStudent && (
+                  <Link
+                    to={`/student/courses/${id}/assignments`}
+                    className="btn-primary flex items-center gap-2"
+                  >
+                    <FileText size={16} />
+                    View Assignment
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Quizzes */}
-      {isEnrolled || isTeacher ? (
-        <div className="card">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-gray-900">Quizzes</h3>
+      <div className="card">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-semibold text-gray-900">Quizzes</h3>
+          {isTeacher && (
+            <Link
+              to={`/teacher/courses/${id}/quizzes`}
+              className="btn-secondary flex items-center gap-2"
+            >
+              <HelpCircle size={16} />
+              Manage Quizzes
+            </Link>
+          )}
+        </div>
+        
+        {quizzes.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <HelpCircle size={48} className="mx-auto mb-4 text-gray-300" />
+            <p>No quizzes created yet</p>
             {isTeacher && (
               <Link
                 to={`/teacher/courses/${id}/quizzes`}
-                className="btn-secondary flex items-center gap-2"
+                className="btn-primary inline-flex items-center gap-2 mt-4"
               >
                 <HelpCircle size={16} />
-                Manage Quizzes
+                Create Quiz
               </Link>
             )}
           </div>
-          
-          {quizzes.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <HelpCircle size={48} className="mx-auto mb-4 text-gray-300" />
-              <p>No quizzes created yet</p>
-              {isTeacher && (
-                <Link
-                  to={`/teacher/courses/${id}/quizzes`}
-                  className="btn-primary inline-flex items-center gap-2 mt-4"
-                >
-                  <HelpCircle size={16} />
-                  Create Quiz
-                </Link>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {quizzes.map((quiz) => {
-                const hasQuestions = quiz.questions && quiz.questions.length > 0;
-                return (
-                  <div key={quiz.quizId} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <HelpCircle className="text-blue-600" size={20} />
+        ) : (
+          <div className="space-y-3">
+            {quizzes.map((quiz) => (
+              <div key={quiz.quizId} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <HelpCircle className="text-blue-600" size={20} />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-medium text-gray-900">{quiz.title}</h4>
+                  <p className="text-sm text-gray-500">Duration: {quiz.duration} mins | Questions: {quiz.questions?.length || 0}</p>
+                </div>
+                {isStudent && (
+                  quizAttempts[quiz.quizId] ? (
+                    <div className="text-green-600 font-semibold">
+                      ✓ Completed
                     </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{quiz.title}</h4>
-                      <p className="text-sm text-gray-500">
-                        {hasQuestions ? `${quiz.questions.length} questions` : 'No questions'} • {quiz.duration} mins • Pass: {quiz.passingScore}%
-                      </p>
-                      {!hasQuestions && (
-                        <p className="text-xs text-orange-600 mt-1">Quiz has no questions yet</p>
-                      )}
-                    </div>
-                    {isStudent && hasQuestions && (
-                      <Link
-                        to={`/student/courses/${id}/quiz/${quiz.quizId}`}
-                        className="btn-primary px-3 py-1 text-sm"
-                      >
-                        Take Quiz
-                      </Link>
-                    )}
-                    {isStudent && !hasQuestions && (
-                      <span className="text-sm text-gray-400 px-3 py-1">Not Available</span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="card text-center py-8 text-gray-500">
-          <Lock className="mx-auto mb-4 text-gray-300" size={48} />
-          <p>Enroll in this course to view quizzes</p>
-        </div>
-      )}
+                  ) : (
+                    <Link
+                      to={`/student/courses/${id}/quiz/${quiz.quizId}`}
+                      className="btn-primary flex items-center gap-2"
+                    >
+                      <Play size={16} />
+                      Start Quiz
+                    </Link>
+                  )
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Course Rating - Only for enrolled students */}
-      {isEnrolled && isStudent && (
+      {isStudent && (
         <div className="card">
           <h3 className="text-xl font-semibold text-gray-900 mb-6">Rate this Course</h3>
           <p className="text-gray-600 mb-4">Share your feedback to help improve this course for future students.</p>

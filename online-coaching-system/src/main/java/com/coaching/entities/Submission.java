@@ -18,6 +18,7 @@ public class Submission {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "assignment_id", nullable = false)
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     private Assignment assignment;
 
     @ManyToOne(fetch = FetchType.EAGER)

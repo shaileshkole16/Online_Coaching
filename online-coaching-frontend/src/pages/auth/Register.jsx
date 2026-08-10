@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { useTheme } from '../../contexts/ThemeContext';
-import { GraduationCap, Mail, Lock, User, Phone } from 'lucide-react';
+import { GraduationCap, Mail, Lock, User, Phone, Rocket } from 'lucide-react';
 
 const Register = () => {
   const [userType, setUserType] = useState('student');
@@ -17,11 +16,17 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const { success: showSuccess, error: showError } = useToast();
-  const { colors } = useTheme();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Phone number validation - must be exactly 10 digits
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
+      showError('Please enter a valid 10-digit phone number');
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       showError('Passwords do not match');
@@ -70,33 +75,35 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: colors.background }}>
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-blue-50 to-indigo-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
+        {/* Header Section */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style={{ backgroundColor: colors.primary }}>
-            <GraduationCap className="text-white" size={32} />
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-primary-600 to-blue-700 mb-4 shadow-2xl">
+            <GraduationCap className="text-white" size={40} />
           </div>
-          <h1 className="text-3xl font-bold" style={{ color: colors.text }}>Create Account</h1>
-          <p className="mt-2" style={{ color: colors.textSecondary }}>Join our online coaching platform</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 tracking-tight">
+            Create Account
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Join our learning platform
+          </p>
         </div>
 
-        <div className="card" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+        {/* Register Card */}
+        <div className="card shadow-2xl border-0">
           {/* User Type Selection */}
-          <div className="grid grid-cols-3 gap-2 mb-6">
+          <div className="grid grid-cols-3 gap-3 mb-6">
             {['student', 'teacher', 'admin'].map((type) => (
               <button
                 key={type}
                 type="button"
                 onClick={() => setUserType(type)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   userType === type
-                    ? 'text-white'
+                    ? 'bg-primary-600 text-white shadow-md'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
-                style={{
-                  backgroundColor: userType === type ? colors.primary : colors.surfaceVariant,
-                  color: userType === type ? colors.onError : colors.text,
-                }}
               >
                 {type.charAt(0).toUpperCase() + type.slice(1)}
               </button>
@@ -105,111 +112,91 @@ const Register = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: colors.text }}>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Full Name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: colors.textSecondary }} size={20} />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="input-field pl-10"
+                  className="input-field pl-12"
                   placeholder="John Doe"
-                  style={{
-                    backgroundColor: colors.background,
-                    borderColor: colors.border,
-                    color: colors.text,
-                  }}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: colors.text }}>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: colors.textSecondary }} size={20} />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                 <input
                   type="email"
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="input-field pl-10"
+                  className="input-field pl-12"
                   placeholder="you@example.com"
-                  style={{
-                    backgroundColor: colors.background,
-                    borderColor: colors.border,
-                    color: colors.text,
-                  }}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: colors.text }}>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Phone Number
               </label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: colors.textSecondary }} size={20} />
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                 <input
                   type="tel"
                   required
+                  maxLength={10}
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="input-field pl-10"
-                  placeholder="+91 98765 43210"
-                  style={{
-                    backgroundColor: colors.background,
-                    borderColor: colors.border,
-                    color: colors.text,
+                  onChange={(e) => {
+                    // Only allow numbers
+                    const value = e.target.value.replace(/[^0-9]/g, '');
+                    setFormData({ ...formData, phone: value });
                   }}
+                  className="input-field pl-12"
+                  placeholder="9876543210"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: colors.text }}>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: colors.textSecondary }} size={20} />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                 <input
                   type="password"
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="input-field pl-10"
-                  placeholder="••••••••"
-                  style={{
-                    backgroundColor: colors.background,
-                    borderColor: colors.border,
-                    color: colors.text,
-                  }}
+                  className="input-field pl-12"
+                  placeholder="•••••••••"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: colors.text }}>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Confirm Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: colors.textSecondary }} size={20} />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                 <input
                   type="password"
                   required
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="input-field pl-10"
-                  placeholder="••••••••"
-                  style={{
-                    backgroundColor: colors.background,
-                    borderColor: colors.border,
-                    color: colors.text,
-                  }}
+                  className="input-field pl-12"
+                  placeholder="•••••••••"
                 />
               </div>
             </div>
@@ -218,7 +205,6 @@ const Register = () => {
               type="submit"
               disabled={loading}
               className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ backgroundColor: colors.primary, color: colors.onError }}
             >
               {loading ? (
                 <>
@@ -226,23 +212,22 @@ const Register = () => {
                   Creating account...
                 </>
               ) : (
-                `Create ${userType.charAt(0).toUpperCase() + userType.slice(1)} Account`
+                <>
+                  <Rocket size={20} />
+                  Create Account
+                </>
               )}
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p style={{ color: colors.textSecondary }}>
+          <div className="mt-6 pt-6 border-t border-gray-200 text-center">
+            <p className="text-gray-600">
               Already have an account?{' '}
-              <Link to="/login" className="font-medium hover:underline" style={{ color: colors.primary }}>
-                Sign in
+              <Link to="/login" className="font-semibold text-primary-600 hover:text-primary-700 transition-colors">
+                Sign in here
               </Link>
             </p>
           </div>
-        </div>
-
-        <div className="mt-6 text-center text-sm" style={{ color: colors.textSecondary }}>
-          <p>Online Coaching System - CDAC Final Project</p>
         </div>
       </div>
     </div>

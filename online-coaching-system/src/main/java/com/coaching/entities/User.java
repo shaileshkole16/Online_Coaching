@@ -25,4 +25,12 @@ public class User {
     private String password;
     
     private String role; // student, teacher, admin
+    
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
+    private Student student;
+    
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
+    private Teacher teacher;
 }

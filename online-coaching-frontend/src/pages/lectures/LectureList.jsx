@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { lectureAPI, uploadAPI } from '../../services/api';
+import { lectureAPI, uploadAPI, studentAPI } from '../../services/api';
 import { 
   Play, 
   Clock, 
@@ -39,10 +39,23 @@ const LectureList = () => {
     uploadDate: new Date().toISOString().split('T')[0],
   });
   const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [studentId, setStudentId] = useState(null);
+  const videoRef = useRef(null);
 
   useEffect(() => {
     fetchLectures();
+    fetchStudentId();
   }, [courseId]);
+
+  const fetchStudentId = async () => {
+    try {
+      const { user } = useAuth();
+      const studentRes = await studentAPI.getStudentByUserId(user.id);
+      setStudentId(studentRes.data.studentId);
+    } catch (err) {
+      console.log('Failed to get student ID');
+    }
+  };
 
   const fetchLectures = async () => {
     try {
@@ -178,6 +191,31 @@ const LectureList = () => {
       showError('Failed to delete lecture');
       console.error('Failed to delete lecture:', err);
     }
+  };
+
+  const handleVideoProgress = async (lectureId, percentage) => {
+    if (!studentId) return;
+    
+    try {
+      await fetch('http://localhost:8080/api/lecture-progress', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          student: { studentId },
+          lecture: { lectureId },
+          watchPercentage: percentage,
+        }),
+      });
+    } catch (err) {
+      console.error('Failed to update video progress:', err);
+    }
+  };
+
+  const handleWatchVideo = (lecture) => {
+    setSelectedVideoUrl(lecture.videoUrl);
+    setShowVideoModal(true);
   };
 
   if (loading) {
@@ -643,13 +681,26 @@ const LectureList = () => {
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   title="Video Lecture"
+                  onTimeUpdate={(e) => {
+                    const duration = e.target.duration;
+                    const currentTime = e.target.currentTime;
+                    const percentage = duration > 0 ? (currentTime / duration) * 100 : 0;
+                    handleVideoProgress(lectures.find(l => l.videoUrl === selectedVideoUrl)?.lectureId, Math.round(percentage));
+                  }}
                 />
               ) : (
                 <video
+                  ref={videoRef}
                   src={selectedVideoUrl}
                   controls
                   className="w-full h-full"
                   title="Video Lecture"
+                  onTimeUpdate={(e) => {
+                    const duration = e.target.duration;
+                    const currentTime = e.target.currentTime;
+                    const percentage = duration > 0 ? (currentTime / duration) * 100 : 0;
+                    handleVideoProgress(lectures.find(l => l.videoUrl === selectedVideoUrl)?.lectureId, Math.round(percentage));
+                  }}
                 />
               )}
             </div>

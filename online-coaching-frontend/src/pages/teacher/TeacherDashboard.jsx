@@ -113,7 +113,7 @@ const TeacherDashboard = () => {
     },
     {
       label: 'Average Rating',
-      value: `${dashboard?.averageRating || 0}/5`,
+      value: `${(dashboard?.averageRating || 0).toFixed(1)}/5`,
       icon: TrendingUp,
       color: 'bg-orange-500',
       bgColor: 'bg-orange-50',
@@ -144,11 +144,11 @@ const TeacherDashboard = () => {
           return (
             <div key={stat.label} className="card">
               <div className="flex items-center justify-between">
-                <div>
+                <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-600">{stat.label}</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">{stat.value}</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2 truncate">{stat.value}</p>
                 </div>
-                <div className={`p-4 rounded-full ${stat.bgColor}`}>
+                <div className={`p-4 rounded-full ${stat.bgColor} ml-4`}>
                   <Icon className={stat.textColor} size={24} />
                 </div>
               </div>

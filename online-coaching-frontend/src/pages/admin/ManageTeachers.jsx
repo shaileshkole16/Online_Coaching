@@ -53,8 +53,8 @@ const ManageTeachers = () => {
   const handleEdit = (teacher) => {
     setEditingTeacher(teacher);
     setFormData({
-      name: teacher.user?.name || '',
-      email: teacher.user?.email || '',
+      name: teacher.name || '',
+      email: teacher.email || '',
       phone: teacher.phone || '',
       address: teacher.address || '',
       qualification: teacher.qualification || '',
@@ -68,14 +68,28 @@ const ManageTeachers = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await teacherAPI.updateTeacher(editingTeacher.teacherId, formData);
+      // Structure the data to match backend expectations
+      const updateData = {
+        user: {
+          name: formData.name,
+          email: formData.email
+        },
+        phone: formData.phone,
+        address: formData.address,
+        qualification: formData.qualification,
+        experience: formData.experience,
+        specialization: formData.specialization,
+        bio: formData.bio
+      };
+      
+      await teacherAPI.updateTeacher(editingTeacher.teacherId, updateData);
       setShowEditModal(false);
       setEditingTeacher(null);
       setSuccess('Teacher updated successfully');
       setTimeout(() => setSuccess(''), 3000);
       fetchTeachers();
     } catch (err) {
-      setError('Failed to update teacher');
+      setError('Failed to update teacher: ' + (err.response?.data || err.message));
       console.error(err);
     }
   };
@@ -89,7 +103,7 @@ const ManageTeachers = () => {
       setSuccess('Teacher deleted successfully');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Failed to delete teacher');
+      setError('Failed to delete teacher: ' + (err.response?.data || err.message));
       console.error(err);
     }
   };
@@ -109,8 +123,8 @@ const ManageTeachers = () => {
   };
 
   const filteredTeachers = teachers.filter(teacher =>
-    teacher.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    teacher.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    teacher.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    teacher.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     teacher.specialization?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -199,11 +213,11 @@ const ManageTeachers = () => {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                           <span className="text-green-600 font-semibold">
-                            {teacher.user?.name?.charAt(0) || 'T'}
+                            {teacher.name?.charAt(0) || 'T'}
                           </span>
                         </div>
                         <div>
-                          <span className="font-medium text-gray-900">{teacher.user?.name}</span>
+                          <span className="font-medium text-gray-900">{teacher.name}</span>
                           {teacher.qualification && (
                             <p className="text-xs text-gray-500 mt-1">{teacher.qualification}</p>
                           )}
@@ -214,7 +228,7 @@ const ManageTeachers = () => {
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <Mail size={14} />
-                          {teacher.user?.email}
+                          {teacher.email}
                         </div>
                         {teacher.phone && (
                           <div className="flex items-center gap-2 text-sm text-gray-600">

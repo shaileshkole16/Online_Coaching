@@ -125,118 +125,123 @@ public class AuthService {
     public AuthResponse login(LoginRequest req) {
         String requestedRole = req.getUserType();
         
-        // If userType is specified, validate the role
-        if (requestedRole != null && !requestedRole.isEmpty()) {
-            requestedRole = requestedRole.toUpperCase();
-            
-            if (requestedRole.equals("STUDENT")) {
-                var student = studentRepo.findByUser_Email(req.getEmail());
-                if (student.isPresent()) {
-                    if (passwordEncoder.matches(req.getPassword(), student.get().getUser().getPassword())) {
-                        String token = jwtUtil.generateToken(req.getEmail(), "STUDENT");
-                        AuthResponse.UserResponse userResponse = new AuthResponse.UserResponse(
-                            student.get().getUser().getUserId(),
-                            student.get().getUser().getName(),
-                            student.get().getUser().getEmail(),
-                            student.get().getUser().getRole(),
-                            student.get().getPhone()
-                        );
-                        return new AuthResponse(token, "STUDENT", student.get().getUser().getName(), "Login successful!", student.get().getUser().getUserId(), userResponse);
-                    }
-                    return new AuthResponse(null, null, null, "Wrong password!", null, null);
+        // If userType is not specified, auto-detect based on email
+        if (requestedRole == null || requestedRole.isEmpty()) {
+            // Try student first
+            var student = studentRepo.findByUser_Email(req.getEmail());
+            if (student.isPresent()) {
+                if (passwordEncoder.matches(req.getPassword(), student.get().getUser().getPassword())) {
+                    String token = jwtUtil.generateToken(req.getEmail(), "STUDENT");
+                    AuthResponse.UserResponse userResponse = new AuthResponse.UserResponse(
+                        student.get().getUser().getUserId(),
+                        student.get().getUser().getName(),
+                        student.get().getUser().getEmail(),
+                        student.get().getUser().getRole(),
+                        student.get().getPhone()
+                    );
+                    return new AuthResponse(token, "STUDENT", student.get().getUser().getName(), "Login successful!", student.get().getUser().getUserId(), userResponse);
                 }
-                return new AuthResponse(null, null, null, "Student not found with this email!", null, null);
+                return new AuthResponse(null, null, null, "Wrong password!", null, null);
             }
             
-            if (requestedRole.equals("TEACHER")) {
-                var teacher = teacherRepo.findByUser_Email(req.getEmail());
-                if (teacher.isPresent()) {
-                    if (passwordEncoder.matches(req.getPassword(), teacher.get().getUser().getPassword())) {
-                        String token = jwtUtil.generateToken(req.getEmail(), "TEACHER");
-                        AuthResponse.UserResponse userResponse = new AuthResponse.UserResponse(
-                            teacher.get().getUser().getUserId(),
-                            teacher.get().getUser().getName(),
-                            teacher.get().getUser().getEmail(),
-                            teacher.get().getUser().getRole(),
-                            teacher.get().getPhone()
-                        );
-                        return new AuthResponse(token, "TEACHER", teacher.get().getUser().getName(), "Login successful!", teacher.get().getUser().getUserId(), userResponse);
-                    }
-                    return new AuthResponse(null, null, null, "Wrong password!", null, null);
+            // Try teacher
+            var teacher = teacherRepo.findByUser_Email(req.getEmail());
+            if (teacher.isPresent()) {
+                if (passwordEncoder.matches(req.getPassword(), teacher.get().getUser().getPassword())) {
+                    String token = jwtUtil.generateToken(req.getEmail(), "TEACHER");
+                    AuthResponse.UserResponse userResponse = new AuthResponse.UserResponse(
+                        teacher.get().getUser().getUserId(),
+                        teacher.get().getUser().getName(),
+                        teacher.get().getUser().getEmail(),
+                        teacher.get().getUser().getRole(),
+                        teacher.get().getPhone()
+                    );
+                    return new AuthResponse(token, "TEACHER", teacher.get().getUser().getName(), "Login successful!", teacher.get().getUser().getUserId(), userResponse);
                 }
-                return new AuthResponse(null, null, null, "Teacher not found with this email!", null, null);
+                return new AuthResponse(null, null, null, "Wrong password!", null, null);
             }
             
-            if (requestedRole.equals("ADMIN")) {
-                var admin = adminRepo.findByUser_Email(req.getEmail());
-                if (admin.isPresent()) {
-                    if (passwordEncoder.matches(req.getPassword(), admin.get().getUser().getPassword())) {
-                        String token = jwtUtil.generateToken(req.getEmail(), "ADMIN");
-                        AuthResponse.UserResponse userResponse = new AuthResponse.UserResponse(
-                            admin.get().getUser().getUserId(),
-                            admin.get().getUser().getName(),
-                            admin.get().getUser().getEmail(),
-                            admin.get().getUser().getRole(),
-                            null
-                        );
-                        return new AuthResponse(token, "ADMIN", admin.get().getUser().getName(), "Login successful!", admin.get().getUser().getUserId(), userResponse);
-                    }
-                    return new AuthResponse(null, null, null, "Wrong password!", null, null);
+            // Try admin
+            var admin = adminRepo.findByUser_Email(req.getEmail());
+            if (admin.isPresent()) {
+                if (passwordEncoder.matches(req.getPassword(), admin.get().getUser().getPassword())) {
+                    String token = jwtUtil.generateToken(req.getEmail(), "ADMIN");
+                    AuthResponse.UserResponse userResponse = new AuthResponse.UserResponse(
+                        admin.get().getUser().getUserId(),
+                        admin.get().getUser().getName(),
+                        admin.get().getUser().getEmail(),
+                        admin.get().getUser().getRole(),
+                        admin.get().getPhone()
+                    );
+                    return new AuthResponse(token, "ADMIN", admin.get().getUser().getName(), "Login successful!", admin.get().getUser().getUserId(), userResponse);
                 }
-                return new AuthResponse(null, null, null, "Admin not found with this email!", null, null);
+                return new AuthResponse(null, null, null, "Wrong password!", null, null);
             }
+            
+            return new AuthResponse(null, null, null, "User not found with this email!", null, null);
         }
         
-        // Fallback to original logic if no userType specified
-        var student = studentRepo.findByUser_Email(req.getEmail());
-        if (student.isPresent()) {
-            if (passwordEncoder.matches(req.getPassword(), student.get().getUser().getPassword())) {
-                String token = jwtUtil.generateToken(req.getEmail(), "STUDENT");
-                AuthResponse.UserResponse userResponse = new AuthResponse.UserResponse(
-                    student.get().getUser().getUserId(),
-                    student.get().getUser().getName(),
-                    student.get().getUser().getEmail(),
-                    student.get().getUser().getRole(),
-                    student.get().getPhone()
-                );
-                return new AuthResponse(token, "STUDENT", student.get().getUser().getName(), "Login successful!", student.get().getUser().getUserId(), userResponse);
+        // If userType is specified, validate the role
+        requestedRole = requestedRole.toUpperCase();
+        
+        if (requestedRole.equals("STUDENT")) {
+            var student = studentRepo.findByUser_Email(req.getEmail());
+            if (student.isPresent()) {
+                if (passwordEncoder.matches(req.getPassword(), student.get().getUser().getPassword())) {
+                    String token = jwtUtil.generateToken(req.getEmail(), "STUDENT");
+                    AuthResponse.UserResponse userResponse = new AuthResponse.UserResponse(
+                        student.get().getUser().getUserId(),
+                        student.get().getUser().getName(),
+                        student.get().getUser().getEmail(),
+                        student.get().getUser().getRole(),
+                        student.get().getPhone()
+                    );
+                    return new AuthResponse(token, "STUDENT", student.get().getUser().getName(), "Login successful!", student.get().getUser().getUserId(), userResponse);
+                }
+                return new AuthResponse(null, null, null, "Wrong password!", null, null);
             }
-            return new AuthResponse(null, null, null, "Wrong password!", null, null);
+            return new AuthResponse(null, null, null, "Student not found with this email!", null, null);
         }
-
-        var teacher = teacherRepo.findByUser_Email(req.getEmail());
-        if (teacher.isPresent()) {
-            if (passwordEncoder.matches(req.getPassword(), teacher.get().getUser().getPassword())) {
-                String token = jwtUtil.generateToken(req.getEmail(), "TEACHER");
-                AuthResponse.UserResponse userResponse = new AuthResponse.UserResponse(
-                    teacher.get().getUser().getUserId(),
-                    teacher.get().getUser().getName(),
-                    teacher.get().getUser().getEmail(),
-                    teacher.get().getUser().getRole(),
-                    teacher.get().getPhone()
-                );
-                return new AuthResponse(token, "TEACHER", teacher.get().getUser().getName(), "Login successful!", teacher.get().getUser().getUserId(), userResponse);
+        
+        if (requestedRole.equals("TEACHER")) {
+            var teacher = teacherRepo.findByUser_Email(req.getEmail());
+            if (teacher.isPresent()) {
+                if (passwordEncoder.matches(req.getPassword(), teacher.get().getUser().getPassword())) {
+                    String token = jwtUtil.generateToken(req.getEmail(), "TEACHER");
+                    AuthResponse.UserResponse userResponse = new AuthResponse.UserResponse(
+                        teacher.get().getUser().getUserId(),
+                        teacher.get().getUser().getName(),
+                        teacher.get().getUser().getEmail(),
+                        teacher.get().getUser().getRole(),
+                        teacher.get().getPhone()
+                    );
+                    return new AuthResponse(token, "TEACHER", teacher.get().getUser().getName(), "Login successful!", teacher.get().getUser().getUserId(), userResponse);
+                }
+                return new AuthResponse(null, null, null, "Wrong password!", null, null);
             }
-            return new AuthResponse(null, null, null, "Wrong password!", null, null);
+            return new AuthResponse(null, null, null, "Teacher not found with this email!", null, null);
         }
-
-        var admin = adminRepo.findByUser_Email(req.getEmail());
-        if (admin.isPresent()) {
-            if (passwordEncoder.matches(req.getPassword(), admin.get().getUser().getPassword())) {
-                String token = jwtUtil.generateToken(req.getEmail(), "ADMIN");
-                AuthResponse.UserResponse userResponse = new AuthResponse.UserResponse(
-                    admin.get().getUser().getUserId(),
-                    admin.get().getUser().getName(),
-                    admin.get().getUser().getEmail(),
-                    admin.get().getUser().getRole(),
-                    null
-                );
-                return new AuthResponse(token, "ADMIN", admin.get().getUser().getName(), "Login successful!", admin.get().getUser().getUserId(), userResponse);
+        
+        if (requestedRole.equals("ADMIN")) {
+            var admin = adminRepo.findByUser_Email(req.getEmail());
+            if (admin.isPresent()) {
+                if (passwordEncoder.matches(req.getPassword(), admin.get().getUser().getPassword())) {
+                    String token = jwtUtil.generateToken(req.getEmail(), "ADMIN");
+                    AuthResponse.UserResponse userResponse = new AuthResponse.UserResponse(
+                        admin.get().getUser().getUserId(),
+                        admin.get().getUser().getName(),
+                        admin.get().getUser().getEmail(),
+                        admin.get().getUser().getRole(),
+                        null
+                    );
+                    return new AuthResponse(token, "ADMIN", admin.get().getUser().getName(), "Login successful!", admin.get().getUser().getUserId(), userResponse);
+                }
+                return new AuthResponse(null, null, null, "Wrong password!", null, null);
             }
-            return new AuthResponse(null, null, null, "Wrong password!", null, null);
+            return new AuthResponse(null, null, null, "Admin not found with this email!", null, null);
         }
-
-        return new AuthResponse(null, null, null, "User not found!", null, null);
+        
+        return new AuthResponse(null, null, null, "Invalid credentials!", null, null);
     }
 
     public AuthResponse logout() {
@@ -256,44 +261,8 @@ public class AuthService {
             return userRepo.save(user);
         });
     }
-    
-    
-    
-    
-    
-    
-    
-    
 
-    // ✅ FORGOT PASSWORD
-//    public AuthResponse forgotPassword(ForgotPasswordRequest req) {
-//        String email = req.getEmail();
-//
-//        boolean exists = studentRepo.existsByEmail(email) || teacherRepo.existsByEmail(email)
-//                || adminRepo.findByEmail(email).isPresent();
-//
-//        if (!exists)
-//            return new AuthResponse(null, null, null, "Email not registered!");
-//
-//        // Delete old tokens for this email
-//        resetTokenRepo.deleteByEmail(email);
-//
-//        // Generate 6-digit OTP
-//        String otp = String.valueOf(new Random().nextInt(900000) + 100000);
-//
-//        PasswordResetToken resetToken = new PasswordResetToken();
-//        resetToken.setEmail(email);
-//        resetToken.setOtp(otp);
-//        resetToken.setExpiryTime(LocalDateTime.now().plusMinutes(10));
-//        resetToken.setUsed(false);
-//        resetTokenRepo.save(resetToken);
-//
-//        // ⚠️ In real project: send OTP via email (use JavaMailSender)
-//        // For now, returning OTP in response for testing
-//        return new AuthResponse(null, null, null, "OTP sent! (Test OTP: " + otp + ")");
-//    }
-    
-    @Transactional  // ✅ ADD THIS
+    @Transactional
     public AuthResponse forgotPassword(ForgotPasswordRequest req) {
         String email = req.getEmail();
 
@@ -319,7 +288,6 @@ public class AuthService {
         return new AuthResponse(null, null, null, "OTP sent! (Test OTP: " + otp + ")", null, null);
     }
 
-    // ✅ RESET PASSWORD
     public AuthResponse resetPassword(ResetPasswordRequest req) {
         var tokenOpt = resetTokenRepo.findByEmailAndOtpAndUsedFalse(req.getEmail(), req.getOtp());
 

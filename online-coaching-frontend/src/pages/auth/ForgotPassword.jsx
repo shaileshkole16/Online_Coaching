@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from '../../contexts/ToastContext';
 import { authAPI } from '../../services/api';
-import { Mail, ArrowLeft, Key } from 'lucide-react';
+import { Mail, ArrowLeft, Key, GraduationCap } from 'lucide-react';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -16,7 +16,6 @@ const ForgotPassword = () => {
 
   const handleRequestOtp = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
 
     try {
@@ -38,7 +37,6 @@ const ForgotPassword = () => {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    setError('');
 
     if (newPassword !== confirmPassword) {
       showError('Passwords do not match');
@@ -63,19 +61,24 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-blue-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-blue-50 to-indigo-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <Link
           to="/login"
-          className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+          className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 font-semibold"
         >
           <ArrowLeft size={20} />
           Back to Login
         </Link>
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Forgot Password?</h1>
-          <p className="text-gray-600 mt-2">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-primary-600 to-blue-700 mb-4 shadow-2xl">
+            <Key className="text-white" size={40} />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 tracking-tight">
+            Forgot Password?
+          </h1>
+          <p className="text-gray-600 text-lg">
             {showOtpInput 
               ? 'Enter the OTP sent to your email'
               : 'Enter your email to receive a password reset OTP'
@@ -83,22 +86,22 @@ const ForgotPassword = () => {
           </p>
         </div>
 
-        <div className="card">
+        <div className="card shadow-2xl border-0">
 
           {!showOtpInput ? (
             <form onSubmit={handleRequestOtp} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="input-field pl-10"
+                    className="input-field pl-12"
                     placeholder="you@example.com"
                   />
                 </div>
@@ -121,16 +124,16 @@ const ForgotPassword = () => {
             </form>
           ) : (
             <form onSubmit={handleResetPassword} className="space-y-6">
-              <div className="bg-blue-50 p-4 rounded-lg mb-4">
-                <div className="flex items-center gap-2 text-blue-800">
+              <div className="bg-blue-50 p-4 rounded-lg mb-4 border border-blue-200">
+                <div className="flex items-center gap-2 text-blue-800 font-semibold">
                   <Key size={18} />
-                  <span className="font-medium">Test OTP: {otp}</span>
+                  <span>Test OTP: {otp}</span>
                 </div>
-                <p className="text-xs text-blue-600 mt-1">In production, this would be sent via email</p>
+                <p className="text-sm text-blue-600 mt-1">In production, this would be sent via email</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Enter OTP
                 </label>
                 <input
@@ -145,7 +148,7 @@ const ForgotPassword = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   New Password
                 </label>
                 <input
@@ -159,7 +162,7 @@ const ForgotPassword = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Confirm New Password
                 </label>
                 <input
@@ -176,7 +179,7 @@ const ForgotPassword = () => {
                 <button
                   type="button"
                   onClick={() => setShowOtpInput(false)}
-                  className="btn-secondary flex-1"
+                  className="btn-secondary flex-1 font-semibold"
                 >
                   Back
                 </button>
@@ -198,10 +201,13 @@ const ForgotPassword = () => {
             </form>
           )}
 
-          <div className="mt-6 text-center">
-            <Link to="/login" className="text-primary-600 hover:text-primary-700 font-medium">
-              Remember your password? Sign in
-            </Link>
+          <div className="mt-6 pt-6 border-t border-gray-200 text-center">
+            <p className="text-gray-600">
+              Remember your password?{' '}
+              <Link to="/login" className="font-semibold text-primary-600 hover:text-primary-700 transition-colors">
+                Sign in
+              </Link>
+            </p>
           </div>
         </div>
       </div>

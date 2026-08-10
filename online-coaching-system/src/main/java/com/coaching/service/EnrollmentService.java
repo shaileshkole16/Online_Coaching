@@ -3,6 +3,7 @@ package com.coaching.service;
 import com.coaching.entities.Enrollment;
 import com.coaching.entities.Student;
 import com.coaching.entities.Course;
+import java.math.BigDecimal;
 import com.coaching.repository.EnrollmentRepository;
 import com.coaching.repository.StudentRepository;
 import com.coaching.repository.CourseRepository;
@@ -34,6 +35,14 @@ public class EnrollmentService {
         enrollment.setCourse(course.get());
         enrollment.setEnrollDate(LocalDate.now());
         enrollment.setStatus("active");
+        enrollment.setPlanType("standard");
+        
+        // Set amount paid to course price, default to null if course has no price
+        if (course.get().getPrice() != null && course.get().getPrice().doubleValue() > 0) {
+            enrollment.setAmountPaid(course.get().getPrice().doubleValue());
+        } else {
+            enrollment.setAmountPaid(null); // This will indicate it's free
+        }
         
         enrollmentRepo.save(enrollment);
         return "Student enrolled successfully! Enrollment ID: " + enrollment.getEnrollId();

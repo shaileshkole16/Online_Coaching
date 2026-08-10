@@ -50,8 +50,8 @@ const ManageStudents = () => {
   const handleEdit = (student) => {
     setEditingStudent(student);
     setFormData({
-      name: student.user?.name || '',
-      email: student.user?.email || '',
+      name: student.name || '',
+      email: student.email || '',
       phone: student.phone || '',
       address: student.address || '',
       dateOfBirth: student.dateOfBirth || '',
@@ -63,14 +63,26 @@ const ManageStudents = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await studentAPI.updateStudent(editingStudent.studentId, formData);
+      // Structure the data to match backend expectations
+      const updateData = {
+        user: {
+          name: formData.name,
+          email: formData.email
+        },
+        phone: formData.phone,
+        address: formData.address,
+        bio: formData.bio,
+        dateOfBirth: formData.dateOfBirth
+      };
+      
+      await studentAPI.updateStudent(editingStudent.studentId, updateData);
       setShowEditModal(false);
       setEditingStudent(null);
       setSuccess('Student updated successfully');
       setTimeout(() => setSuccess(''), 3000);
       fetchStudents();
     } catch (err) {
-      setError('Failed to update student');
+      setError('Failed to update student: ' + (err.response?.data || err.message));
       console.error(err);
     }
   };
@@ -84,7 +96,7 @@ const ManageStudents = () => {
       setSuccess('Student deleted successfully');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Failed to delete student');
+      setError('Failed to delete student: ' + (err.response?.data || err.message));
       console.error(err);
     }
   };
@@ -104,8 +116,8 @@ const ManageStudents = () => {
   };
 
   const filteredStudents = students.filter(student =>
-    student.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.user?.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    student.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    student.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -193,11 +205,11 @@ const ManageStudents = () => {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
                           <span className="text-primary-600 font-semibold">
-                            {student.user?.name?.charAt(0) || 'S'}
+                            {student.name?.charAt(0) || 'S'}
                           </span>
                         </div>
                         <div>
-                          <span className="font-medium text-gray-900">{student.user?.name}</span>
+                          <span className="font-medium text-gray-900">{student.name}</span>
                           {student.bio && (
                             <p className="text-xs text-gray-500 mt-1 line-clamp-1">{student.bio}</p>
                           )}
@@ -208,7 +220,7 @@ const ManageStudents = () => {
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <Mail size={14} />
-                          {student.user?.email}
+                          {student.email}
                         </div>
                         {student.phone && (
                           <div className="flex items-center gap-2 text-sm text-gray-600">

@@ -26,5 +26,6 @@ public class StudyMaterial {
 
     @ManyToOne
     @JoinColumn(name = "course_id")
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     private Course course;
 }

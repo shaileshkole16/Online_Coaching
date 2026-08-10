@@ -26,6 +26,7 @@ public class Enrollment {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "course_id", nullable = false)
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     private Course course;
 
     @JsonFormat(pattern = "yyyy-MM-dd")

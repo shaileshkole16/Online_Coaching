@@ -9,10 +9,9 @@ import CourseListScreen from '../screens/teacher/CourseListScreen';
 import CreateCourseScreen from '../screens/teacher/CreateCourseScreen';
 import EditCourseScreen from '../screens/teacher/EditCourseScreen';
 import CourseStudentsScreen from '../screens/teacher/CourseStudentsScreen';
-import MessagesScreen from '../screens/teacher/MessagesScreen';
+import DiscussionForumScreen from '../screens/teacher/DiscussionForumScreen';
 import ManageResultsScreen from '../screens/teacher/ManageResultsScreen';
 import TeacherCourseRatingsScreen from '../screens/teacher/TeacherCourseRatingsScreen';
-import SettingsScreen from '../screens/shared/SettingsScreen';
 import LectureListScreen from '../screens/shared/LectureListScreen';
 import AssignmentListScreen from '../screens/shared/AssignmentListScreen';
 import QuizListScreen from '../screens/shared/QuizListScreen';
@@ -49,9 +48,8 @@ const TeacherNavigator = () => {
           let iconName;
           if (route.name === 'Home') iconName = 'dashboard';
           else if (route.name === 'Courses') iconName = 'book';
-          else if (route.name === 'Messages') iconName = 'message';
+          else if (route.name === 'Forum') iconName = 'forum';
           else if (route.name === 'Results') iconName = 'assessment';
-          else if (route.name === 'Settings') iconName = 'settings';
           
           return <MaterialIcons name={iconName} size={size} color={color} />;
         },
@@ -65,9 +63,8 @@ const TeacherNavigator = () => {
     >
       <Tab.Screen name="Home" component={TeacherStack} options={{ title: 'Dashboard' }} />
       <Tab.Screen name="Courses" component={CourseListScreen} options={{ title: 'Courses' }} />
-      <Tab.Screen name="Messages" component={MessagesScreen} options={{ title: 'Messages' }} />
+      <Tab.Screen name="Forum" component={DiscussionForumScreen} options={{ title: 'Forum' }} />
       <Tab.Screen name="Results" component={ManageResultsScreen} options={{ title: 'Results' }} />
-      <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
     </Tab.Navigator>
   );
 };

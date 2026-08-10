@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { courseAPI, enrollmentAPI, studentAPI, teacherAPI } from '../../services/api';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   BookOpen, 
   Search, 
@@ -14,6 +14,7 @@ import {
 
 const CourseList = () => {
   const { user, isStudent, isTeacher } = useAuth();
+  const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -72,6 +73,9 @@ const CourseList = () => {
       const enrollRes = await enrollmentAPI.enrollStudent(studentId, courseId);
       const enrollmentsRes = await enrollmentAPI.getStudentEnrollments(studentId);
       setEnrolledCourses(enrollmentsRes.data || []);
+      
+      // Redirect to success screen
+      navigate(`/student/courses/${courseId}/success`);
     } catch (err) {
       console.error('Failed to enroll:', err);
       alert('Failed to enroll in course. Please try again.');
@@ -186,21 +190,12 @@ const CourseList = () => {
                     <span>{course.price ? `₹${course.price}` : 'Free'}</span>
                   </div>
                   <Link
-                    to={`/${isTeacher ? 'teacher' : 'student'}/courses/${courseId}`}
+                    to={`/${isTeacher ? 'teacher' : 'student'}/courses/${courseId}${isStudent && !isEnrolled ? '/preview' : ''}`}
                     className="btn-primary"
                   >
                     {isEnrolled ? 'Continue' : 'View Details'}
                   </Link>
                 </div>
-
-                {isStudent && !isEnrolled && (
-                  <button
-                    onClick={() => handleEnroll(courseId)}
-                    className="btn-primary w-full mt-4"
-                  >
-                    Enroll Now
-                  </button>
-                )}
               </div>
             );
           })}

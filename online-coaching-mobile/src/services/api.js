@@ -220,6 +220,21 @@ export const courseRatingAPI = {
   deleteRating: (ratingId) => api.delete(`/course-ratings/delete/${ratingId}`),
 };
 
+// Discussion Forum API
+export const discussionForumAPI = {
+  createForum: (data) => api.post('/discussion-forum/create', data),
+  updateForum: (forumId, data) => api.put(`/discussion-forum/${forumId}`, data),
+  getForum: (forumId) => api.get(`/discussion-forum/${forumId}`),
+  getCourseForums: (courseId) => api.get(`/discussion-forum/course/${courseId}`),
+  getStudentForums: (studentId) => api.get(`/discussion-forum/student/${studentId}`),
+  getTeacherForums: (teacherId) => api.get(`/discussion-forum/teacher/${teacherId}`),
+  createReply: (data) => api.post('/discussion-forum/reply', data),
+  acceptAnswer: (replyId) => api.post(`/discussion-forum/reply/${replyId}/accept`),
+  getForumReplies: (forumId) => api.get(`/discussion-forum/${forumId}/replies`),
+  deleteForum: (forumId) => api.delete(`/discussion-forum/${forumId}`),
+  deleteReply: (replyId) => api.delete(`/discussion-forum/reply/${replyId}`),
+};
+
 // File Upload API
 export const uploadAPI = {
   uploadProfile: (file) => {

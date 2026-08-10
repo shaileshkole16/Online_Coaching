@@ -14,17 +14,12 @@ import {
   Award,
   BarChart3,
   Star,
-  Calendar,
-  Tag,
-  HelpCircle,
   Settings,
-  Bell,
-  Trophy,
-  CheckCircle,
   MessageCircle,
-  Video,
-  Heart,
-  Clock
+  Bot,
+  GraduationCap,
+  Ticket,
+  Shield
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -52,48 +47,37 @@ const Layout = () => {
 
   if (isAdmin) {
     navItems.push(
-      { icon: BarChart3, label: 'Analytics', path: '/admin/analytics' },
+      { icon: BarChart3, label: 'Tickets', path: '/admin/tickets' },
       { icon: Users, label: 'Students', path: '/admin/students' },
       { icon: Users, label: 'Teachers', path: '/admin/teachers' },
-      { icon: Settings, label: 'Settings', path: '/admin/settings' },
+      { icon: BookOpen, label: 'Courses', path: '/admin/courses' },
+      { icon: TrendingUp, label: 'Enrollments', path: '/admin/enrollments' },
+      { icon: Shield, label: 'Audit Logs', path: '/admin/audit-logs' },
     );
   }
 
   if (isStudent) {
     navItems.push(
       { icon: BookOpen, label: 'My Courses', path: '/student/courses' },
-      { icon: Trophy, label: 'Progress', path: '/student/progress' },
       { icon: FileText, label: 'Submissions', path: '/student/submissions' },
       { icon: Award, label: 'Results', path: '/student/results' },
-      { icon: Bell, label: 'Announcements', path: '/student/announcements' },
-      { icon: CheckCircle, label: 'Certificates', path: '/student/certificates' },
-      { icon: Clock, label: 'Attendance', path: '/student/attendance' },
-      { icon: MessageCircle, label: 'Forum', path: '/student/forum' },
-      { icon: Video, label: 'Live Classes', path: '/student/live-classes' },
-      { icon: Heart, label: 'Wishlist', path: '/student/wishlist' },
-      { icon: MessageSquare, label: 'Messages', path: '/student/messages' },
+      { icon: MessageCircle, label: 'Forums', path: '/student/forum' },
+      { icon: Bot, label: 'AI Assistant', path: '/student/ai-chat' },
+      { icon: Ticket, label: 'Support', path: '/student/support' },
       { icon: User, label: 'Profile', path: '/student/profile' },
-      { icon: Settings, label: 'Settings', path: '/student/settings' },
     );
   }
 
   if (isTeacher) {
     navItems.push(
-      { icon: BookOpen, label: 'My Courses', path: '/teacher/courses' },
+      { icon: GraduationCap, label: 'My Courses', path: '/teacher/courses' },
       { icon: Star, label: 'Ratings', path: '/teacher/ratings' },
-      { icon: MessageSquare, label: 'Messages', path: '/teacher/messages' },
+      { icon: MessageCircle, label: 'Forums', path: '/teacher/forum' },
+      { icon: Bot, label: 'AI Assistant', path: '/teacher/ai-chat' },
       { icon: User, label: 'Profile', path: '/teacher/profile' },
-      { icon: Settings, label: 'Settings', path: '/teacher/settings' },
     );
   }
 
-  // Shared routes for all authenticated users
-  navItems.push(
-    { icon: Calendar, label: 'Calendar', path: '/calendar' },
-    { icon: Tag, label: 'Categories', path: '/categories' },
-    { icon: HelpCircle, label: 'Support Tickets', path: '/support-tickets' },
-    { icon: Star, label: 'Course Reviews', path: '/course-reviews' },
-  );
 
   return (
     <div className="min-h-screen bg-gray-50">

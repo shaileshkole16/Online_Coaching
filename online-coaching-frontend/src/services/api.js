@@ -67,11 +67,29 @@ export const analyticsAPI = {
 // Admin API
 export const adminAPI = {
   getDashboard: () => api.get('/admin/dashboard'),
-  getAnalytics: () => api.get('/admin/analytics'),
   getAllStudents: () => api.get('/admin/students'),
   getAllTeachers: () => api.get('/admin/teachers'),
   blockStudent: (id) => api.delete(`/admin/block/student/${id}`),
   blockTeacher: (id) => api.delete(`/admin/block/teacher/${id}`),
+  getSettings: () => api.get('/admin/settings'),
+  updateSettings: (data) => api.put('/admin/settings', data),
+  getAllCourses: () => api.get('/admin/courses'),
+  approveCourse: (courseId) => api.put(`/admin/courses/${courseId}/approve`),
+  rejectCourse: (courseId) => api.put(`/admin/courses/${courseId}/reject`),
+  getAllEnrollments: () => api.get('/admin/enrollments'),
+};
+
+// Support Ticket API
+export const supportTicketAPI = {
+  createTicket: (data) => api.post('/support-tickets/create', data),
+  updateTicket: (ticketId, data) => api.put(`/support-tickets/${ticketId}`, data),
+  getTicket: (ticketId) => api.get(`/support-tickets/${ticketId}`),
+  getTicketByNumber: (ticketNumber) => api.get(`/support-tickets/number/${ticketNumber}`),
+  getUserTickets: (userId) => api.get(`/support-tickets/user/${userId}`),
+  getOpenTickets: () => api.get('/support-tickets/open'),
+  getResolvedTickets: () => api.get('/support-tickets/resolved'),
+  getAllTickets: () => api.get('/support-tickets'),
+  deleteTicket: (ticketId) => api.delete(`/support-tickets/${ticketId}`),
 };
 
 // Student API
@@ -368,19 +386,6 @@ export const categoryAPI = {
   assignToCategory: (data) => api.post('/categories/assign', data),
   removeFromCategory: (data) => api.delete('/categories/remove', { params: data }),
   deleteCategory: (categoryId) => api.delete(`/categories/${categoryId}`),
-};
-
-// Support Ticket API
-export const supportTicketAPI = {
-  createTicket: (data) => api.post('/support-tickets/create', data),
-  updateTicket: (ticketId, data) => api.put(`/support-tickets/${ticketId}`, data),
-  getTicket: (ticketId) => api.get(`/support-tickets/${ticketId}`),
-  getTicketByNumber: (ticketNumber) => api.get(`/support-tickets/number/${ticketNumber}`),
-  getUserTickets: (userId) => api.get(`/support-tickets/user/${userId}`),
-  getOpenTickets: () => api.get('/support-tickets/open'),
-  getResolvedTickets: () => api.get('/support-tickets/resolved'),
-  getAllTickets: () => api.get('/support-tickets'),
-  deleteTicket: (ticketId) => api.delete(`/support-tickets/${ticketId}`),
 };
 
 // User Settings API

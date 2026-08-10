@@ -17,6 +17,8 @@ public class Lecture {
     private Long lectureId;
 
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "video_url")
@@ -30,5 +32,6 @@ public class Lecture {
 
     @ManyToOne
     @JoinColumn(name = "course_id")
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     private Course course;
 }

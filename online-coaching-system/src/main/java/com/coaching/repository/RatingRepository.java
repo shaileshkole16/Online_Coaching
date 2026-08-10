@@ -10,4 +10,5 @@ public interface RatingRepository extends JpaRepository<Rating, Integer> {
     List<Rating> findByTeacher_TeacherId(Integer teacherId);
     Optional<Rating> findByStudent_StudentIdAndTeacher_TeacherId(Integer studentId, Integer teacherId);
     boolean existsByStudent_StudentIdAndTeacher_TeacherId(Integer studentId, Integer teacherId);
+    void deleteByTeacher_TeacherId(Integer teacherId);
 }

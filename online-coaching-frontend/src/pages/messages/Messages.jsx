@@ -69,9 +69,14 @@ const Messages = () => {
     
     try {
       // Send initial message to start conversation
+      const senderId = user.id || user.userId;
+      const receiverId = selectedRecipient.userId || selectedRecipient.id;
+      
+      console.log('Starting conversation with:', { senderId, receiverId, selectedRecipient });
+      
       await messageAPI.sendMessage({
-        senderId: user.id,
-        receiverId: selectedRecipient.userId || selectedRecipient.id,
+        senderId: senderId,
+        receiverId: receiverId,
         message: 'Hello, I would like to start a conversation with you.',
       });
       setShowNewMessageModal(false);
@@ -79,7 +84,7 @@ const Messages = () => {
       fetchInbox();
     } catch (err) {
       console.error('Failed to start conversation:', err);
-      alert('Failed to start conversation');
+      alert('Failed to start conversation: ' + (err.response?.data || err.message));
     }
   };
 
@@ -97,8 +102,11 @@ const Messages = () => {
     if (!newMessage.trim() || !selectedConversation) return;
 
     try {
+      const senderId = user.id || user.userId;
+      console.log('Sending message:', { senderId, receiverId: selectedConversation.senderId, message: newMessage });
+      
       await messageAPI.sendMessage({
-        senderId: user.id,
+        senderId: senderId,
         receiverId: selectedConversation.senderId,
         message: newMessage,
       });
@@ -106,6 +114,7 @@ const Messages = () => {
       fetchConversation(selectedConversation.senderId);
     } catch (err) {
       console.error('Failed to send message:', err);
+      alert('Failed to send message: ' + (err.response?.data || err.message));
     }
   };
 

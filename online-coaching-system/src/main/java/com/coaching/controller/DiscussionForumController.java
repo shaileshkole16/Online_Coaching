@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/discussion-forum")
+@RequestMapping("/api/discussion-forum")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class DiscussionForumController {

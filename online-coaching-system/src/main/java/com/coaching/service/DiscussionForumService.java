@@ -30,19 +30,29 @@ public class DiscussionForumService {
     
     public DiscussionForumResponse createForum(DiscussionForumRequest request) {
         DiscussionForum forum = new DiscussionForum();
-        forum.setCourse(courseRepository.findById(request.getCourseId()).orElseThrow());
+        forum.setCourse(courseRepository.findById(request.getCourseId())
+            .orElseThrow(() -> new RuntimeException("Course not found with ID: " + request.getCourseId())));
+        
         if (request.getStudentId() != null) {
-            forum.setStudent(studentRepository.findById(request.getStudentId()).orElseThrow());
+            try {
+                forum.setStudent(studentRepository.findById(request.getStudentId()).orElse(null));
+            } catch (Exception e) {
+                System.err.println("Warning: Could not find student with ID: " + request.getStudentId());
+            }
         }
         if (request.getTeacherId() != null) {
-            forum.setTeacher(teacherRepository.findById(request.getTeacherId()).orElseThrow());
+            try {
+                forum.setTeacher(teacherRepository.findById(request.getTeacherId()).orElse(null));
+            } catch (Exception e) {
+                System.err.println("Warning: Could not find teacher with ID: " + request.getTeacherId());
+            }
         }
         forum.setTitle(request.getTitle());
         forum.setContent(request.getContent());
         forum.setCategory(request.getCategory());
         forum.setTags(request.getTags());
         forum.setStatus(ForumStatus.valueOf(request.getStatus()));
-        forum.setIsPinned(request.getIsPinned());
+        forum.setIsPinned(request.getIsPinned() != null ? request.getIsPinned() : false);
         
         forum = forumRepository.save(forum);
         return convertToResponse(forum);

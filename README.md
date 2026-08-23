@@ -1,6 +1,6 @@
 # Online Coaching System
 
-A comprehensive Learning Management System (LMS) built with modern technologies to facilitate online education with features for students, teachers, and administrators.
+A full-stack Learning Management System built with Spring Boot, React, and React Native for online education with features for students, teachers, and administrators.
 
 ## 🌟 Features
 
@@ -10,26 +10,19 @@ A comprehensive Learning Management System (LMS) built with modern technologies 
 - **Video Lectures**: Support for both video URLs and direct file uploads (MP4, MOV, AVI, MKV)
 - **Quiz System**: Create quizzes with multiple question types, auto-grading, and result tracking
 - **Assignment Management**: Create assignments, student submissions, and teacher evaluation
-- **Real-time Messaging**: In-app messaging between students and teachers
+- **Messaging**: In-app messaging between students and teachers
 - **Progress Tracking**: Track student progress, quiz scores, and assignment grades
 - **Payment Integration**: Razorpay integration for course enrollment payments
-- **Analytics Dashboard**: Comprehensive analytics for tracking user engagement and platform usage
-- **Dark Mode**: Complete dark mode support across all interfaces
-
-### Advanced Features
+- **Dark Mode**: Dark mode support across all interfaces
 - **Role-Based Access Control**: Different permissions for students, teachers, and admins
 - **Course Ratings & Feedback**: Students can rate courses and provide feedback
-- **Teacher Analytics**: Teachers can view ratings, feedback, and engagement metrics
 - **File Upload Management**: Secure file handling for lectures and assignments
-- **Password Reset**: Complete forgot password flow with email verification
-- **Responsive Design**: Mobile-first approach with React Native mobile app
-- **Real-time Notifications**: Push notifications for important updates
 
 ## 🛠 Tech Stack
 
 ### Backend
-- **Framework**: Spring Boot 4.0.6
-- **Language**: Java 17
+- **Framework**: Spring Boot
+- **Language**: Java
 - **Database**: MySQL
 - **ORM**: Hibernate/JPA
 - **Security**: Spring Security with JWT authentication
@@ -220,103 +213,6 @@ npm run web        # For web
 
 ## 📚 API Documentation
 
-### Authentication Endpoints
-
-#### Login
-```http
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "password123",
-  "userType": "student"
-}
-```
-
-#### Register
-```http
-POST /api/auth/register
-Content-Type: application/json
-
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "password123",
-  "phone": "1234567890",
-  "role": "STUDENT"
-}
-```
-
-### Course Endpoints
-
-#### Get All Courses
-```http
-GET /api/courses
-Authorization: Bearer {token}
-```
-
-#### Create Course
-```http
-POST /api/courses
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "title": "Course Title",
-  "description": "Course description",
-  "price": 999.00,
-  "category": "Programming"
-}
-```
-
-### Payment Endpoints
-
-#### Create Order
-```http
-POST /api/payments/create-order
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "studentId": 1,
-  "courseId": 1,
-  "amount": 999.00,
-  "currency": "INR",
-  "planType": "FULL"
-}
-```
-
-#### Verify Payment
-```http
-POST /api/payments/verify
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "orderId": "order_12345",
-  "paymentId": "pay_12345",
-  "signature": "signature_12345"
-}
-```
-
-### Analytics Endpoints
-
-#### Track Event
-```http
-POST /api/analytics/track
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "eventName": "course_enrollment",
-  "properties": "{\"courseId\": 1}",
-  "sessionId": "session_12345",
-  "userId": 1,
-  "userRole": "STUDENT"
-}
-```
-
 For complete API documentation, refer to [API_DOCUMENTATION.md](API_DOCUMENTATION.md)
 
 ## 🧪 Testing
@@ -336,20 +232,19 @@ npm test
 ## 📊 Database Schema
 
 ### Main Tables
-- **users**: User accounts and authentication
-- **students**: Student-specific information
-- **teachers**: Teacher-specific information
-- **courses**: Course information and metadata
-- **enrollments**: Student course enrollments
-- **lectures**: Course lectures and video content
-- **assignments**: Course assignments
-- **quiz**: Quiz definitions
-- **quiz_questions**: Quiz questions
-- **quiz_submissions**: Student quiz attempts
-- **messages**: User messaging system
-- **payments**: Payment transactions
-- **analytics_events**: Analytics and event tracking
-- **course_ratings**: Course ratings and feedback
+- users
+- students
+- teachers
+- courses
+- enrollments
+- lectures
+- assignments
+- quiz
+- quiz_questions
+- quiz_submissions
+- messages
+- payments
+- course_ratings
 
 ## 🔒 Security Features
 
@@ -410,37 +305,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Shailesh Kole** - *Initial development* - [shaileshkole16](https://github.com/shaileshkole16)
 
-## 🙏 Acknowledgments
-
-- Spring Boot team for the excellent framework
-- React and React Native communities
-- Razorpay for payment gateway integration
-- All open-source contributors
-
-## 📞 Support
-
-For support, email support@example.com or open an issue in the GitHub repository.
 
 ## 🗺 Roadmap
 
-- [ ] Add video conferencing integration
-- [ ] Implement advanced analytics dashboard
-- [ ] Add certificate generation for course completion
-- [ ] Implement discussion forums
-- [ ] Add live streaming capabilities
-- [ ] Integrate with more payment gateways
-- [ ] Add mobile push notifications
-- [ ] Implement AI-powered course recommendations
+- [ ] Add live classes
+- [ ] Implement AI-based course recommendations
+- [ ] Add certificate generation
 - [ ] Add multi-language support
-- [ ] Create teacher marketplace
 
-## 📈 Performance
-
-- **Backend Response Time**: < 200ms average
-- **Frontend Load Time**: < 2s initial load
-- **Database Optimization**: Indexed queries for common operations
-- **Caching**: Redis caching for frequently accessed data
-- **CDN Integration**: Static assets served via CDN
 
 ## 🔧 Configuration
 
@@ -474,24 +346,6 @@ Please refer to the GitHub Issues page for a list of known issues and their stat
 - [Database Schema](database_setup.sql)
 - [API Documentation](API_DOCUMENTATION.md)
 
-## 🎯 Use Cases
-
-- **Educational Institutions**: Complete LMS for schools and colleges
-- **Corporate Training**: Employee training and onboarding
-- **Online Tutoring**: One-on-one or group tutoring
-- **Skill Development**: Professional skill enhancement courses
-- **Certification Programs**: Industry certification preparation
-
-## 💡 Key Highlights
-
-- **Scalable Architecture**: Designed to handle thousands of concurrent users
-- **Modern UI/UX**: Clean, intuitive interface with dark mode support
-- **Mobile-First**: Responsive design with dedicated mobile app
-- **Real-time Features**: Instant messaging and notifications
-- **Secure**: Enterprise-grade security features
-- **Analytics**: Comprehensive tracking and reporting
-- **Payment Integration**: Seamless payment processing
-- **Multi-Platform**: Web, Android, and iOS support
 
 ---
 

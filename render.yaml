@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: online-coaching-api
+    runtime: docker
+    plan: free
+    region: oregon
+    rootDir: online-coaching-system
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: update
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: online-coaching-db
+          property: connectionString
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+
+databases:
+  - name: online-coaching-db
+    plan: free
+    databaseName: onlinecoaching
+    user: coaching
+    ipAllowList: []

@@ -31,7 +31,7 @@ public class Quiz {
     @Column(name = "passing_score")
     private Integer passingScore;
 
-    @Column(name = "questions", columnDefinition = "longtext")
+    @Column(name = "questions", columnDefinition = "TEXT")
     private String questions;
 
     @ManyToOne(fetch = FetchType.EAGER)

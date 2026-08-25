@@ -48,7 +48,8 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Login failed' 
+        error: error.response?.data?.message
+          || (!error.response ? 'Cannot reach the server. Wait a minute if the API is waking up, then try again.' : 'Login failed')
       };
     }
   };
@@ -94,7 +95,8 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Registration failed' 
+        error: error.response?.data?.message
+          || (!error.response ? 'Cannot reach the server. Wait a minute if the API is waking up, then try again.' : 'Registration failed')
       };
     }
   };
